@@ -36,38 +36,33 @@ import android.view.Surface
 import com.serenegiant.glutils.RenderHandler
 
 class MediaVideoEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoderListener, private val mWidth: Int, private val mHeight: Int) : MediaEncoder(muxer, listener) {
-    private var mRenderHandler: RenderHandler? = null
-    private var mSurface: Surface? = null
-
-    init {
-        Log.i(TAG, "MediaVideoEncoder: ")
-        mRenderHandler = RenderHandler.createHandler(TAG)
-    }
+    private var renderHandler = RenderHandler.createHandler(TAG)
+    private var surface: Surface? = null
 
     fun frameAvailableSoon(tex_matrix: FloatArray): Boolean {
         val result: Boolean = super.frameAvailableSoon()
         if (result)
-            mRenderHandler!!.draw(tex_matrix)
+            renderHandler!!.draw(tex_matrix)
         return result
     }
 
     fun frameAvailableSoon(tex_matrix: FloatArray, mvp_matrix: FloatArray): Boolean {
         val result: Boolean = super.frameAvailableSoon()
         if (result)
-            mRenderHandler!!.draw(tex_matrix, mvp_matrix)
+            renderHandler!!.draw(tex_matrix, mvp_matrix)
         return result
     }
 
     override fun frameAvailableSoon(): Boolean {
         val result: Boolean = super.frameAvailableSoon()
         if (result)
-            mRenderHandler!!.draw(null)
+            renderHandler!!.draw(null)
         return result
     }
 
     @Throws(IOException::class)
     override fun prepare() {
-        Log.i(TAG, "prepare: ")
+        Log.i(TAG, "prepare")
         mTrackIndex = -1
         mIsEOS = false
         mMuxerStarted = mIsEOS
@@ -90,7 +85,7 @@ class MediaVideoEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEn
         mMediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         // get Surface for encoder input
         // this method only can call between #configure and #start
-        mSurface = mMediaCodec.createInputSurface()    // API >= 18
+        surface = mMediaCodec.createInputSurface()    // API >= 18
         mMediaCodec.start()
         Log.i(TAG, "prepare finishing")
         if (mListener != null) {
@@ -104,18 +99,18 @@ class MediaVideoEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEn
     }
 
     fun setEglContext(shared_context: EGLContext, tex_id: Int) {
-        mRenderHandler!!.setEglContext(shared_context, tex_id, mSurface, true)
+        renderHandler!!.setEglContext(shared_context, tex_id, surface, true)
     }
 
     override fun release() {
         Log.i(TAG, "release:")
-        if (mSurface != null) {
-            mSurface!!.release()
-            mSurface = null
+        if (surface != null) {
+            surface!!.release()
+            surface = null
         }
-        if (mRenderHandler != null) {
-            mRenderHandler!!.release()
-            mRenderHandler = null
+        if (renderHandler != null) {
+            renderHandler!!.release()
+            renderHandler = null
         }
         super.release()
     }
@@ -135,10 +130,10 @@ class MediaVideoEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEn
     companion object {
         private val TAG = "MediaVideoEncoder"
 
-        private val MIME_TYPE = "video/avc"
+        private const val MIME_TYPE = "video/avc"
         // parameters for recording
-        private val FRAME_RATE = 25
-        private val BPP = 0.25f
+        private const val FRAME_RATE = 25
+        private const val BPP = 0.25f
 
         /**
          * select the first codec that match a specific MIME type

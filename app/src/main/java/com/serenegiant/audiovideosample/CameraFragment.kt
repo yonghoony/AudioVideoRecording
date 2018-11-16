@@ -149,7 +149,7 @@ class CameraFragment : Fragment() {
             mediaMuxer = MediaMuxerWrapper(".mp4")    // if you record audio only, ".m4a" is also OK.
 
             MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, cameraView!!.videoWidth, cameraView!!.videoHeight)
-            MediaAudioEncoder(mediaMuxer, mMediaEncoderListener)
+            MediaAudioEncoder(mediaMuxer!!, mMediaEncoderListener)
 
             mediaMuxer!!.prepare()
             mediaMuxer!!.startRecording()
