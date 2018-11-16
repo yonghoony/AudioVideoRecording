@@ -43,7 +43,6 @@ import com.serenegiant.encoder.MediaVideoEncoder
 class CameraFragment : Fragment() {
 
     companion object {
-        private const val DEBUG = false    // TODO set false on release
         private const val TAG = "CameraFragment"
     }
 
@@ -86,22 +85,26 @@ class CameraFragment : Fragment() {
      */
     private val mMediaEncoderListener = object : MediaEncoder.MediaEncoderListener {
         override fun onPrepared(encoder: MediaEncoder) {
-            if (DEBUG) Log.v(TAG, "onPrepared:encoder=$encoder")
+            Log.v(TAG, "onPrepared:encoder=$encoder")
             if (encoder is MediaVideoEncoder)
                 cameraView!!.setVideoEncoder(encoder)
         }
 
         override fun onStopped(encoder: MediaEncoder) {
-            if (DEBUG) Log.v(TAG, "onStopped:encoder=$encoder")
+            Log.v(TAG, "onStopped:encoder=$encoder")
             if (encoder is MediaVideoEncoder)
                 cameraView!!.setVideoEncoder(null)
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_main, container, false)
         cameraView = rootView.findViewById<View>(R.id.cameraView) as CameraGLView
-        cameraView!!.setVideoSize(1280, 720)
+
+        val display = activity.windowManager.defaultDisplay
+
+        cameraView!!.setVideoSize(display.width, display.height)
+//        cameraView!!.setVideoSize(1280, 720)
         cameraView!!.setOnClickListener(onClickListener)
         scaleModeView = rootView.findViewById<View>(R.id.scalemode_textview) as TextView
         updateScaleModeText()
@@ -112,12 +115,12 @@ class CameraFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (DEBUG) Log.v(TAG, "onResume:")
+        Log.v(TAG, "onResume:")
         cameraView!!.onResume()
     }
 
     override fun onPause() {
-        if (DEBUG) Log.v(TAG, "onPause:")
+        Log.v(TAG, "onPause:")
         stopRecording()
         cameraView!!.onPause()
         super.onPause()
@@ -142,18 +145,14 @@ class CameraFragment : Fragment() {
      * of encoder is heavy work
      */
     private fun startRecording() {
-        if (DEBUG) Log.v(TAG, "startRecording:")
+        Log.v(TAG, "startRecording:")
         try {
             recordButton!!.setColorFilter(-0x10000)    // turn red
             mediaMuxer = MediaMuxerWrapper(".mp4")    // if you record audio only, ".m4a" is also OK.
-            if (true) {
-                // for video capturing
-                MediaVideoEncoder(mediaMuxer, mMediaEncoderListener, cameraView!!.videoWidth, cameraView!!.videoHeight)
-            }
-            if (true) {
-                // for audio capturing
-                MediaAudioEncoder(mediaMuxer, mMediaEncoderListener)
-            }
+
+            MediaVideoEncoder(mediaMuxer, mMediaEncoderListener, cameraView!!.videoWidth, cameraView!!.videoHeight)
+            MediaAudioEncoder(mediaMuxer, mMediaEncoderListener)
+
             mediaMuxer!!.prepare()
             mediaMuxer!!.startRecording()
         } catch (e: IOException) {
@@ -166,12 +165,11 @@ class CameraFragment : Fragment() {
      * request stop recording
      */
     private fun stopRecording() {
-        if (DEBUG) Log.v(TAG, "stopRecording:mediaMuxer=" + mediaMuxer!!)
+        Log.v(TAG, "stopRecording:mediaMuxer=$mediaMuxer")
         recordButton!!.setColorFilter(0)    // return to default color
-        if (mediaMuxer != null) {
-            mediaMuxer!!.stopRecording()
+        mediaMuxer?.let {
+            it.stopRecording()
             mediaMuxer = null
-            // you should not wait here
         }
     }
 }

@@ -86,7 +86,8 @@ public abstract class MediaEncoder implements Runnable {
     public MediaEncoder(final MediaMuxerWrapper muxer, final MediaEncoderListener listener) {
     	if (listener == null) throw new NullPointerException("MediaEncoderListener is null");
     	if (muxer == null) throw new NullPointerException("MediaMuxerWrapper is null");
-		mWeakMuxer = new WeakReference<MediaMuxerWrapper>(muxer);
+
+		mWeakMuxer = new WeakReference<>(muxer);
 		muxer.addEncoder(this);
 		mListener = listener;
         synchronized (mSync) {
