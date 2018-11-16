@@ -490,6 +490,7 @@ public final class CameraGLView extends GLSurfaceView {
 				try {
 					mCamera = Camera.open(CAMERA_ID);
 					final Camera.Parameters params = mCamera.getParameters();
+
 					final List<String> focusModes = params.getSupportedFocusModes();
 					if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
 						params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
@@ -556,7 +557,7 @@ public final class CameraGLView extends GLSurfaceView {
 		}
 
 		private static Camera.Size getClosestSupportedSize(List<Camera.Size> supportedSizes, final int requestedWidth, final int requestedHeight) {
-			return (Camera.Size)Collections.min(supportedSizes, new Comparator<Camera.Size>() {
+			return Collections.min(supportedSizes, new Comparator<Camera.Size>() {
 
 				private int diff(final Camera.Size size) {
 					return Math.abs(requestedWidth - size.width) + Math.abs(requestedHeight - size.height);
