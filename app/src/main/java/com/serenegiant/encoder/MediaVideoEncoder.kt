@@ -27,7 +27,6 @@ import java.io.IOException
 
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
-import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.opengl.EGLContext
 import android.util.Log
@@ -37,7 +36,19 @@ import com.serenegiant.glutils.RenderHandler
 
 class MediaVideoEncoder(muxer: MediaMuxerWrapper,
                         listener: MediaEncoder.MediaEncoderListener,
-                        private val mWidth: Int, private val mHeight: Int) : MediaEncoder(muxer, listener) {
+                        private val width: Int,
+                        private val height: Int)
+    : MediaEncoder(muxer, listener) {
+
+    companion object {
+        private val TAG = "MediaVideoEncoder"
+
+        private const val MIME_TYPE = "video/avc"
+        // parameters for recording
+        private const val FRAME_RATE = 25
+        private const val BPP = 0.25f
+
+    }
 
     private val videoCodecUtils by lazy { VideoCodecUtils() }
     private var renderHandler = RenderHandler.createHandler(TAG)
@@ -78,7 +89,7 @@ class MediaVideoEncoder(muxer: MediaMuxerWrapper,
         }
         Log.i(TAG, "selected codec: " + videoCodecInfo.name)
 
-        val format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight)
+        val format = MediaFormat.createVideoFormat(MIME_TYPE, width, height)
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)    // API >= 18
         format.setInteger(MediaFormat.KEY_BIT_RATE, calcBitRate())
         format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE)
@@ -98,7 +109,6 @@ class MediaVideoEncoder(muxer: MediaMuxerWrapper,
             } catch (e: Exception) {
                 Log.e(TAG, "prepare:", e)
             }
-
         }
     }
 
@@ -120,7 +130,7 @@ class MediaVideoEncoder(muxer: MediaMuxerWrapper,
     }
 
     private fun calcBitRate(): Int {
-        val bitrate = (BPP * FRAME_RATE.toFloat() * mWidth.toFloat() * mHeight.toFloat()).toInt()
+        val bitrate = (BPP * FRAME_RATE.toFloat() * width.toFloat() * height.toFloat()).toInt()
         Log.i(TAG, String.format("bitrate=%5.2f[Mbps]", bitrate.toFloat() / 1024f / 1024f))
         return bitrate
     }
@@ -129,16 +139,6 @@ class MediaVideoEncoder(muxer: MediaMuxerWrapper,
         Log.d(TAG, "sending EOS to encoder")
         mMediaCodec.signalEndOfInputStream()    // API >= 18
         mIsEOS = true
-    }
-
-    companion object {
-        private val TAG = "MediaVideoEncoder"
-
-        private const val MIME_TYPE = "video/avc"
-        // parameters for recording
-        private const val FRAME_RATE = 25
-        private const val BPP = 0.25f
-
     }
 
 }
