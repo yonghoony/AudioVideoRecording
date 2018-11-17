@@ -69,8 +69,8 @@ class CameraFragment : Fragment() {
     private val onClickListener = OnClickListener { view ->
         when (view.id) {
             R.id.cameraView -> {
-                val scale_mode = (cameraView!!.scaleMode + 1) % 4
-                cameraView!!.scaleMode = scale_mode
+                val scaleMode = (cameraView!!.scaleMode + 1) % 4
+                cameraView!!.scaleMode = scaleMode
                 updateScaleModeText()
             }
             R.id.record_button -> if (mediaMuxer == null)
@@ -101,8 +101,14 @@ class CameraFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_main, container, false)
         cameraView = rootView.findViewById<View>(R.id.cameraView) as CameraGLView
 
+        cameraView!!.scaleMode = CameraGLView.SCALE_CROP_CENTER
+
         val display = activity.windowManager.defaultDisplay
-        cameraView!!.setVideoSize(display.width, display.height)
+//        cameraView!!.setVideoSize(display.width, display.height)
+
+//        cameraView!!.setVideoSize(800, 450)
+        cameraView!!.setVideoSize(736, 414)
+
         cameraView!!.setOnClickListener(onClickListener)
         scaleModeView = rootView.findViewById<View>(R.id.scalemode_textview) as TextView
         updateScaleModeText()
@@ -148,7 +154,8 @@ class CameraFragment : Fragment() {
             recordButton!!.setColorFilter(-0x10000)    // turn red
             mediaMuxer = MediaMuxerWrapper(".mp4")    // if you record audio only, ".m4a" is also OK.
 
-            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, cameraView!!.videoWidth, cameraView!!.videoHeight)
+//            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, cameraView!!.videoWidth, cameraView!!.videoHeight)
+            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, 450, 800)
             MediaAudioEncoder(mediaMuxer!!, mMediaEncoderListener)
 
             mediaMuxer!!.prepare()
