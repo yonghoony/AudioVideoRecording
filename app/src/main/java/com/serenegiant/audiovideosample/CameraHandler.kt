@@ -19,7 +19,6 @@ class CameraHandler(private var thread: CameraThread?,
     : Handler() {
     companion object {
         private val TAG = "CameraHandler"
-        private const val MSG_PREVIEW_START = 1
         private const val MSG_PREVIEW_STOP = 2
         private val CAMERA_ID = 0
     }
@@ -29,7 +28,7 @@ class CameraHandler(private var thread: CameraThread?,
     private var isFrontFace: Boolean = false
 
     fun startPreview(width: Int, height: Int) {
-        sendMessage(obtainMessage(MSG_PREVIEW_START, width, height))
+        post { performStartPreview(width, height) }
     }
 
     /**
@@ -39,6 +38,16 @@ class CameraHandler(private var thread: CameraThread?,
     fun stopPreview(needWait: Boolean) {
         synchronized(lock) {
             sendEmptyMessage(MSG_PREVIEW_STOP)
+            post {
+                performStopPreview()
+                synchronized(lock) {
+                    lock.notifyAll()
+                }
+                Looper.myLooper()!!.quit()
+                thread = null
+            }
+
+
             if (needWait && thread!!.isRunning) {
                 try {
                     Log.d(TAG, "wait for terminating of camera thread")
@@ -51,31 +60,12 @@ class CameraHandler(private var thread: CameraThread?,
     }
 
     /**
-     * message handler for camera thread
-     */
-    override fun handleMessage(msg: Message) {
-        when (msg.what) {
-            MSG_PREVIEW_START -> performStartPreview(msg.arg1, msg.arg2)
-            MSG_PREVIEW_STOP -> {
-                stopPreview()
-                synchronized(lock) {
-                    lock.notifyAll()
-                }
-                Looper.myLooper()!!.quit()
-                thread = null
-            }
-            else -> throw RuntimeException("unknown message:what=" + msg.what)
-        }
-    }
-
-
-    /**
      * start camera preview
      *
      * @param width
      * @param height
      */
-    fun performStartPreview(width: Int, height: Int) {
+    private fun performStartPreview(width: Int, height: Int) {
         Log.v(TAG, "startPreview:")
         val parent = cameraViewRef.get()
         if (parent != null && camera == null) {
@@ -149,7 +139,7 @@ class CameraHandler(private var thread: CameraThread?,
     /**
      * stop camera preview
      */
-    fun stopPreview() {
+    private fun performStopPreview() {
         Log.v(TAG, "stopPreview:")
         if (camera != null) {
             camera!!.stopPreview()

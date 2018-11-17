@@ -16,7 +16,7 @@ import java.lang.ref.WeakReference
 class CameraThread(cameraView: CameraGLView) : Thread("Camera thread") {
 
     companion object {
-        private val TAG = "CameraThread"
+        private const val TAG = "CameraThread"
     }
 
     private val readyFence = java.lang.Object()
@@ -25,7 +25,6 @@ class CameraThread(cameraView: CameraGLView) : Thread("Camera thread") {
     @JvmField
     @Volatile
     var isRunning = false
-
 
     var handler: CameraHandler? = null
         get() {
