@@ -10,6 +10,17 @@ class VideoCodecUtils {
     }
 
     /**
+     * color formats that we can use in this class
+     */
+    protected val recognizedFormats by lazy {
+        intArrayOf(
+            //        	MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar,
+            //        	MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar,
+            //        	MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar,
+            MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
+    }
+
+    /**
      * select the first codec that match a specific MIME type
      * @param mimeType
      * @return null if no codec matched
@@ -68,24 +79,10 @@ class VideoCodecUtils {
         return result
     }
 
-    /**
-     * color formats that we can use in this class
-     */
-    protected var recognizedFormats: IntArray? = null
-
-    init {
-        recognizedFormats = intArrayOf(
-            //        	MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar,
-            //        	MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar,
-            //        	MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar,
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
-    }
-
     private fun isRecognizedViewoFormat(colorFormat: Int): Boolean {
         Log.i(TAG, "isRecognizedViewoFormat:colorFormat=$colorFormat")
-        val n = if (recognizedFormats != null) recognizedFormats!!.size else 0
-        for (i in 0 until n) {
-            if (recognizedFormats!![i] == colorFormat) {
+        for (recognizedFormat in recognizedFormats) {
+            if (recognizedFormat == colorFormat) {
                 return true
             }
         }

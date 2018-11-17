@@ -19,6 +19,5 @@ object CameraUtils {
                 return diff(lhs) - diff(rhs)
             }
         })
-
     }
 }
