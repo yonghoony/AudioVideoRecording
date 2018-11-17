@@ -39,6 +39,10 @@ import com.serenegiant.encoder.MediaAudioEncoder
 import com.serenegiant.encoder.MediaEncoder
 import com.serenegiant.encoder.MediaMuxerWrapper
 import com.serenegiant.encoder.MediaVideoEncoder
+import java.io.File
+import android.content.Intent
+import android.net.Uri
+
 
 class CameraFragment : Fragment() {
 
@@ -168,9 +172,20 @@ class CameraFragment : Fragment() {
     private fun stopRecording() {
         Log.v(TAG, "stopRecording:mediaMuxer=$mediaMuxer")
         recordButton!!.setColorFilter(0)    // return to default color
+
         mediaMuxer?.let {
             it.stopRecording()
+            openVideo(it.outputPath)
             mediaMuxer = null
+        }
+    }
+
+    private fun openVideo(videoPath: String?) {
+        videoPath?.let {
+            Log.d(TAG, "outputFile ${it} size=${File(it).length() / 1024 / 1024} MB")
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
+                .setDataAndType(Uri.parse(it), "video/mp4")
+            startActivity(intent)
         }
     }
 }

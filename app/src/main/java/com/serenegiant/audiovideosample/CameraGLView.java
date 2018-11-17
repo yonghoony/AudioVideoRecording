@@ -50,7 +50,6 @@ import com.serenegiant.encoder.MediaVideoEncoder;
  */
 public final class CameraGLView extends GLSurfaceView {
 
-	private static final boolean DEBUG = false; // TODO set false on release
 	private static final String TAG = "CameraGLView";
 
 	private static final int CAMERA_ID = 0;
@@ -77,7 +76,7 @@ public final class CameraGLView extends GLSurfaceView {
 
 	public CameraGLView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs);
-		if (DEBUG) Log.v(TAG, "CameraGLView:");
+		Log.v(TAG, "CameraGLView:");
 		mRenderer = new CameraSurfaceRenderer(this);
 		setEGLContextClientVersion(2);	// GLES 2.0, API >= 8
 		setRenderer(mRenderer);
@@ -88,11 +87,11 @@ public final class CameraGLView extends GLSurfaceView {
 
 	@Override
 	public void onResume() {
-		if (DEBUG) Log.v(TAG, "onResume:");
+		Log.v(TAG, "onResume:");
 		super.onResume();
 		if (hasSurface) {
 			if (mCameraHandler == null) {
-				if (DEBUG) Log.v(TAG, "surface already exist");
+				Log.v(TAG, "surface already exist");
 				startPreview(getWidth(),  getHeight());
 			}
 		}
@@ -100,7 +99,7 @@ public final class CameraGLView extends GLSurfaceView {
 
 	@Override
 	public void onPause() {
-		if (DEBUG) Log.v(TAG, "onPause:");
+		Log.v(TAG, "onPause:");
 		if (mCameraHandler != null) {
 			// just request stop prviewing
 			mCameraHandler.stopPreview(false);
@@ -149,13 +148,13 @@ public final class CameraGLView extends GLSurfaceView {
 	}
 
 	public SurfaceTexture getSurfaceTexture() {
-		if (DEBUG) Log.v(TAG, "getSurfaceTexture:");
+		Log.v(TAG, "getSurfaceTexture:");
 		return mRenderer != null ? mRenderer.mSTexture : null;
 	}
 
 	@Override
 	public void surfaceDestroyed(final SurfaceHolder holder) {
-		if (DEBUG) Log.v(TAG, "surfaceDestroyed:");
+		Log.v(TAG, "surfaceDestroyed:");
 		if (mCameraHandler != null) {
 			// wait for finish previewing here
 			// otherwise camera try to display on un-exist Surface and some error will occure
@@ -168,7 +167,7 @@ public final class CameraGLView extends GLSurfaceView {
 	}
 
 	public void setVideoEncoder(final MediaVideoEncoder encoder) {
-		if (DEBUG) Log.v(TAG, "setVideoEncoder:tex_id=" + mRenderer.hTex + ",encoder=" + encoder);
+		Log.v(TAG, "setVideoEncoder:tex_id=" + mRenderer.hTex + ",encoder=" + encoder);
 		queueEvent(new Runnable() {
 			@Override
 			public void run() {
@@ -197,6 +196,7 @@ public final class CameraGLView extends GLSurfaceView {
 	 * Handler class for asynchronous camera operation
 	 */
 	private static final class CameraHandler extends Handler {
+		private static final String TAG = "CameraHandler";
 		private static final int MSG_PREVIEW_START = 1;
 		private static final int MSG_PREVIEW_STOP = 2;
 		private CameraThread mThread;
@@ -218,7 +218,7 @@ public final class CameraGLView extends GLSurfaceView {
 				sendEmptyMessage(MSG_PREVIEW_STOP);
 				if (needWait && mThread.mIsRunning) {
 					try {
-						if (DEBUG) Log.d(TAG, "wait for terminating of camera thread");
+						Log.d(TAG, "wait for terminating of camera thread");
 						wait();
 					} catch (final InterruptedException e) {
 					}
@@ -281,7 +281,7 @@ public final class CameraGLView extends GLSurfaceView {
     	 */
 		@Override
 		public void run() {
-            if (DEBUG) Log.d(TAG, "Camera thread start");
+            Log.d(TAG, "Camera thread start");
             Looper.prepare();
             synchronized (mReadyFence) {
                 mHandler = new CameraHandler(this);
@@ -289,7 +289,7 @@ public final class CameraGLView extends GLSurfaceView {
                 mReadyFence.notify();
             }
             Looper.loop();
-            if (DEBUG) Log.d(TAG, "Camera thread finish");
+            Log.d(TAG, "Camera thread finish");
             synchronized (mReadyFence) {
                 mHandler = null;
                 mIsRunning = false;
@@ -302,7 +302,7 @@ public final class CameraGLView extends GLSurfaceView {
 		 * @param height
 		 */
 		private final void startPreview(final int width, final int height) {
-			if (DEBUG) Log.v(TAG, "startPreview:");
+			Log.v(TAG, "startPreview:");
 			final CameraGLView parent = mWeakParent.get();
 			if ((parent != null) && (mCamera == null)) {
 				// This is a sample project so just use 0 as camera ID.
@@ -317,7 +317,7 @@ public final class CameraGLView extends GLSurfaceView {
 					} else if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
 						params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 					} else {
-						if (DEBUG) Log.i(TAG, "Camera does not support autofocus");
+						Log.i(TAG, "Camera does not support autofocus");
 					}
 					// let's try fastest frame rate. You will get near 60fps, but your device become hot.
 					final List<int[]> supportedFpsRange = params.getSupportedPreviewFpsRange();
@@ -395,7 +395,7 @@ public final class CameraGLView extends GLSurfaceView {
 		 * stop camera preview
 		 */
 		private void stopPreview() {
-			if (DEBUG) Log.v(TAG, "stopPreview:");
+			Log.v(TAG, "stopPreview:");
 			if (mCamera != null) {
 				mCamera.stopPreview();
 		        mCamera.release();
@@ -411,7 +411,7 @@ public final class CameraGLView extends GLSurfaceView {
 		 * @param params
 		 */
 		private final void setRotation(final Camera.Parameters params) {
-			if (DEBUG) Log.v(TAG, "setRotation:");
+			Log.v(TAG, "setRotation:");
 			final CameraGLView parent = mWeakParent.get();
 			if (parent == null) return;
 
