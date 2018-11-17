@@ -1,10 +1,11 @@
-AudioVideoRecordingSample
+AudioVideoRecording
 =========================
 
-Simultaneous audio and video recording sample using MediaCodec/MediaMuxer
+This is a camera library that records audio and video by using [MediaCodec](https://developer.android.com/reference/android/media/MediaCodec) and [MediaMuxer](https://developer.android.com/reference/android/media/MediaMuxer). It is a fork of https://github.com/saki4510t/AudioVideoRecordingSample.
 
-Copyright (c) 2014-2016 saki t_saki@serenegiant.com
+- Being refactored and rewritten in Kotlin.
 
+=========
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
