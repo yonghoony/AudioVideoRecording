@@ -93,8 +93,7 @@ public final class CameraGLView extends GLSurfaceView {
 		if (hasSurface) {
 			if (mCameraHandler == null) {
 				if (DEBUG) Log.v(TAG, "surface already exist");
-//				startPreview(getWidth(),  getHeight());
-				startPreview(414,  736);
+				startPreview(getWidth(),  getHeight());
 			}
 		}
 	}
@@ -191,11 +190,7 @@ public final class CameraGLView extends GLSurfaceView {
 			thread.start();
 			mCameraHandler = thread.getHandler();
 		}
-
-
-//		mCameraHandler.startPreview(800, 450);
-//		mCameraHandler.startPreview(1280, 720/*width, height*/);
-				mCameraHandler.startPreview(width, height);
+		mCameraHandler.startPreview(width, height);
 	}
 
 	/**

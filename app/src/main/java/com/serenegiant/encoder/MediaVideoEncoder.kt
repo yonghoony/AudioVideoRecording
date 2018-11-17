@@ -35,7 +35,9 @@ import android.view.Surface
 
 import com.serenegiant.glutils.RenderHandler
 
-class MediaVideoEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoderListener, private val mWidth: Int, private val mHeight: Int) : MediaEncoder(muxer, listener) {
+class MediaVideoEncoder(muxer: MediaMuxerWrapper,
+                        listener: MediaEncoder.MediaEncoderListener,
+                        private val mWidth: Int, private val mHeight: Int) : MediaEncoder(muxer, listener) {
     private var renderHandler = RenderHandler.createHandler(TAG)
     private var surface: Surface? = null
 

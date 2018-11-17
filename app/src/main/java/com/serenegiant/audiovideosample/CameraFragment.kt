@@ -104,11 +104,7 @@ class CameraFragment : Fragment() {
         cameraView!!.scaleMode = CameraGLView.SCALE_CROP_CENTER
 
         val display = activity.windowManager.defaultDisplay
-//        cameraView!!.setVideoSize(display.width, display.height)
-
-//        cameraView!!.setVideoSize(800, 450)
-        cameraView!!.setVideoSize(736, 414)
-
+        cameraView!!.setVideoSize(display.width, display.height)
         cameraView!!.setOnClickListener(onClickListener)
         scaleModeView = rootView.findViewById<View>(R.id.scalemode_textview) as TextView
         updateScaleModeText()
@@ -155,7 +151,7 @@ class CameraFragment : Fragment() {
             mediaMuxer = MediaMuxerWrapper(".mp4")    // if you record audio only, ".m4a" is also OK.
 
 //            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, cameraView!!.videoWidth, cameraView!!.videoHeight)
-            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, 450, 800)
+            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, 414, 736)
             MediaAudioEncoder(mediaMuxer!!, mMediaEncoderListener)
 
             mediaMuxer!!.prepare()

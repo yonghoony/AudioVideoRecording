@@ -35,7 +35,8 @@ import android.media.MediaFormat
 import android.media.MediaRecorder
 import android.util.Log
 
-class MediaAudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoderListener) : MediaEncoder(muxer, listener) {
+class MediaAudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoderListener)
+    : MediaEncoder(muxer, listener) {
 
     private var audioThread: AudioThread? = null
 
