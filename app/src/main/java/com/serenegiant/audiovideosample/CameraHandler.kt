@@ -20,15 +20,14 @@ class CameraHandler(private var thread: CameraThread?,
     companion object {
         private val TAG = "CameraHandler"
         private const val MSG_PREVIEW_STOP = 2
-        private val CAMERA_ID = 0
     }
 
     private val lock = java.lang.Object()
     private var camera: Camera? = null
     private var isFrontFace: Boolean = false
 
-    fun startPreview(width: Int, height: Int) {
-        post { performStartPreview(width, height) }
+    fun startPreview(width: Int, height: Int, cameraId: Int) {
+        post { performStartPreview(width, height, cameraId) }
     }
 
     /**
@@ -65,14 +64,14 @@ class CameraHandler(private var thread: CameraThread?,
      * @param width
      * @param height
      */
-    private fun performStartPreview(width: Int, height: Int) {
+    private fun performStartPreview(width: Int, height: Int, cameraId: Int = Camera.CameraInfo.CAMERA_FACING_FRONT) {
         Log.v(TAG, "startPreview:")
         val parent = cameraViewRef.get()
         if (parent != null && camera == null) {
             // This is a sample project so just use 0 as camera ID.
             // it is better to selecting camera is available
             try {
-                camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT)
+                camera = Camera.open(cameraId)
                 val params = camera!!.parameters
 
                 val focusModes = params.supportedFocusModes
@@ -95,16 +94,19 @@ class CameraHandler(private var thread: CameraThread?,
                 Log.i(TAG, String.format("fps:%d-%d", max_fps[0], max_fps[1]))
                 params.setPreviewFpsRange(max_fps[0], max_fps[1])
                 params.setRecordingHint(true)
+                Log.i(TAG, "requested previewSize[$width, $height]")
                 // request closest supported preview size
                 val closestSize = CameraUtils.getClosestSupportedSize(
                     params.supportedPreviewSizes, width, height)
                 params.setPreviewSize(closestSize.width, closestSize.height)
+                Log.i(TAG, "closestSize[${closestSize.width}, ${closestSize.height}]")
                 // request closest picture size for an aspect ratio issue on Nexus7
                 val pictureSize = CameraUtils.getClosestSupportedSize(
                     params.supportedPictureSizes, width, height)
+                Log.i(TAG, "pictureSize[${pictureSize.width}, ${pictureSize.height}]")
                 params.setPictureSize(pictureSize.width, pictureSize.height)
                 // rotate camera preview according to the device orientation
-                setRotation(params)
+                setRotation(cameraId, params)
                 camera!!.parameters = params
                 // get the actual preview size
                 val previewSize = camera!!.parameters.previewSize
@@ -155,14 +157,17 @@ class CameraHandler(private var thread: CameraThread?,
      *
      * @param params
      */
-    private fun setRotation(params: Camera.Parameters) {
-        Log.v(TAG, "setRotation:")
+    private fun setRotation(cameraId: Int, params: Camera.Parameters) {
+        Log.v(TAG, "setRotation")
         val parent = cameraViewRef.get() ?: return
 
         val display = (parent.context
             .getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
         val rotation = display.rotation
         var degrees = 0
+
+        Log.d(TAG, "display.rotation=${display.rotation}")
+
         when (rotation) {
             Surface.ROTATION_0 -> degrees = 0
             Surface.ROTATION_90 -> degrees = 90
@@ -171,16 +176,13 @@ class CameraHandler(private var thread: CameraThread?,
         }
         // get whether the camera is front camera or back camera
         val info = Camera.CameraInfo()
-        Camera.getCameraInfo(CAMERA_ID, info)
+        Camera.getCameraInfo(cameraId, info)
 
         isFrontFace = info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT
+        degrees = (info.orientation + degrees) % 360
+        Log.d(TAG, "info.facing=${info.facing}")
         if (isFrontFace) {    // front camera
-            Log.d(TAG, "Back Camera")
-            degrees = (info.orientation + degrees) % 360
             degrees = (360 - degrees) % 360  // reverse
-        } else {  // back camera
-            Log.d(TAG, "Front Camera")
-            degrees = (info.orientation + degrees + 180) % 360
         }
         // apply rotation setting
         camera!!.setDisplayOrientation(degrees)

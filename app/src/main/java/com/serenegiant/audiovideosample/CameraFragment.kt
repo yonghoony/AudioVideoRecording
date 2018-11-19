@@ -42,6 +42,10 @@ import com.serenegiant.encoder.MediaVideoEncoder
 import java.io.File
 import android.content.Intent
 import android.net.Uri
+import kotlinx.android.synthetic.main.fragment_main.record_button as recordButton
+import kotlinx.android.synthetic.main.fragment_main.scalemode_textview as scaleModeTextView
+import kotlinx.android.synthetic.main.fragment_main.camera_view as cameraView
+import kotlinx.android.synthetic.main.fragment_main.switch_camera_button
 
 
 class CameraFragment : Fragment() {
@@ -50,18 +54,6 @@ class CameraFragment : Fragment() {
         private const val TAG = "CameraFragment"
     }
 
-    /**
-     * for camera preview display
-     */
-    private var cameraView: CameraGLView? = null
-    /**
-     * for scale mode display
-     */
-    private var scaleModeView: TextView? = null
-    /**
-     * button for start/stop recording
-     */
-    private var recordButton: ImageButton? = null
     /**
      * muxer for audio/video recording
      */
@@ -72,9 +64,9 @@ class CameraFragment : Fragment() {
      */
     private val onClickListener = OnClickListener { view ->
         when (view.id) {
-            R.id.cameraView -> {
-                val scaleMode = (cameraView!!.scaleMode + 1) % 4
-                cameraView!!.scaleMode = scaleMode
+            R.id.camera_view -> {
+                val scaleMode = (cameraView.scaleMode + 1) % 4
+                cameraView.scaleMode = scaleMode
                 updateScaleModeText()
             }
             R.id.record_button -> if (mediaMuxer == null)
@@ -91,48 +83,52 @@ class CameraFragment : Fragment() {
         override fun onPrepared(encoder: MediaEncoder) {
             Log.v(TAG, "onPrepared:encoder=$encoder")
             if (encoder is MediaVideoEncoder)
-                cameraView!!.setVideoEncoder(encoder)
+                cameraView.setVideoEncoder(encoder)
         }
 
         override fun onStopped(encoder: MediaEncoder) {
             Log.v(TAG, "onStopped:encoder=$encoder")
             if (encoder is MediaVideoEncoder)
-                cameraView!!.setVideoEncoder(null)
+                cameraView.setVideoEncoder(null)
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_main, container, false)
-        cameraView = rootView.findViewById<View>(R.id.cameraView) as CameraGLView
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_main, container, false)
+    }
 
-        cameraView!!.scaleMode = CameraGLView.SCALE_CROP_CENTER
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        cameraView.scaleMode = CameraGLView.SCALE_CROP_CENTER
 
         val display = activity.windowManager.defaultDisplay
-        cameraView!!.setVideoSize(display.width, display.height)
-        cameraView!!.setOnClickListener(onClickListener)
-        scaleModeView = rootView.findViewById<View>(R.id.scalemode_textview) as TextView
+        cameraView.setVideoSize(display.width, display.height)
+        cameraView.setOnClickListener(onClickListener)
         updateScaleModeText()
-        recordButton = rootView.findViewById<View>(R.id.record_button) as ImageButton
-        recordButton!!.setOnClickListener(onClickListener)
-        return rootView
+        recordButton.setOnClickListener(onClickListener)
+        switch_camera_button.setOnClickListener {
+            cameraView.toggleCamera()
+        }
     }
 
     override fun onResume() {
         super.onResume()
         Log.v(TAG, "onResume:")
-        cameraView!!.onResume()
+        cameraView.onResume()
     }
 
     override fun onPause() {
         Log.v(TAG, "onPause:")
         stopRecording()
-        cameraView!!.onPause()
+        cameraView.onPause()
         super.onPause()
     }
 
     private fun updateScaleModeText() {
-        val scaleMode = cameraView!!.scaleMode
-        scaleModeView!!.text =
+        val scaleMode = cameraView.scaleMode
+        scaleModeTextView.text =
             when (scaleMode) {
                 0 -> "scale to fit"
                 1 -> "keep aspect(viewport)"
@@ -154,7 +150,7 @@ class CameraFragment : Fragment() {
             recordButton!!.setColorFilter(-0x10000)    // turn red
             mediaMuxer = MediaMuxerWrapper(".mp4")    // if you record audio only, ".m4a" is also OK.
 
-//            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, cameraView!!.videoWidth, cameraView!!.videoHeight)
+//            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, cameraView.videoWidth, cameraView.videoHeight)
             MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, 414, 736)
             MediaAudioEncoder(mediaMuxer!!, mMediaEncoderListener)
 

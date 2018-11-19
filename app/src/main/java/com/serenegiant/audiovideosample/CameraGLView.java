@@ -24,6 +24,7 @@ package com.serenegiant.audiovideosample;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
@@ -44,12 +45,14 @@ public final class CameraGLView extends GLSurfaceView {
 	public static final int SCALE_KEEP_ASPECT = 2;
 	public static final int SCALE_CROP_CENTER = 3;
 
+	private final Object lock = new Object();
 	private final CameraSurfaceRenderer mRenderer;
 	public boolean hasSurface;
 	public CameraHandler mCameraHandler = null;
 	public int mVideoWidth, mVideoHeight;
 	private int mRotation;
 	private int mScaleMode = SCALE_CROP_CENTER;
+	private int cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
 	public CameraGLView(final Context context) {
 		this(context, null, 0);
@@ -85,10 +88,8 @@ public final class CameraGLView extends GLSurfaceView {
 	@Override
 	public void onPause() {
 		Log.v(TAG, "onPause:");
-		if (mCameraHandler != null) {
-			// just request stop prviewing
-			mCameraHandler.stopPreview(false);
-		}
+		// just request stop prviewing
+		stopPreview(false);
 		super.onPause();
 	}
 
@@ -140,11 +141,9 @@ public final class CameraGLView extends GLSurfaceView {
 	@Override
 	public void surfaceDestroyed(final SurfaceHolder holder) {
 		Log.v(TAG, "surfaceDestroyed:");
-		if (mCameraHandler != null) {
-			// wait for finish previewing here
-			// otherwise camera try to display on un-exist Surface and some error will occure
-			mCameraHandler.stopPreview(true);
-		}
+		// wait for finish previewing here
+		// otherwise camera try to display on un-exist Surface and some error will occure
+		stopPreview(true);
 		mCameraHandler = null;
 		hasSurface = false;
 		mRenderer.onSurfaceDestroyed();
@@ -166,15 +165,33 @@ public final class CameraGLView extends GLSurfaceView {
 		});
 	}
 
-//********************************************************************************
-//********************************************************************************
-	public synchronized void startPreview(final int width, final int height) {
-		if (mCameraHandler == null) {
-			final CameraThread thread = new CameraThread(this);
-			thread.start();
-			mCameraHandler = thread.getHandler();
+	public void toggleCamera() {
+		if (cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+			cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+		} else {
+			cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
 		}
-		mCameraHandler.startPreview(width, height);
+
+		stopPreview(true);
+		startPreview(getWidth(),  getHeight());
+	}
+
+	public void startPreview(final int width, final int height) {
+		Log.i(TAG, "startPreview [" + width + ", " + height + "]");
+		synchronized (lock) {
+			if (mCameraHandler == null) {
+				final CameraThread thread = new CameraThread(this);
+				thread.start();
+				mCameraHandler = thread.getHandler();
+			}
+			mCameraHandler.startPreview(width, height, cameraId);
+		}
+	}
+
+	private void stopPreview(boolean needWait) {
+		if (mCameraHandler != null) {
+			mCameraHandler.stopPreview(needWait);
+		}
 	}
 
 	public void setRotation(int rotation) {
