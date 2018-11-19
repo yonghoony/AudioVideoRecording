@@ -1,5 +1,6 @@
 package com.serenegiant.audiovideosample
 
+import android.os.Environment
 import android.util.Log
 import com.serenegiant.encoder.AudioEncoder
 import com.serenegiant.encoder.MediaEncoder
@@ -10,7 +11,6 @@ class VideoRecorder(cameraView: CameraGLView) {
 
     companion object {
         private const val TAG = "VideoRecorder"
-        private const val FILE_EXT = ".mp4"
     }
 
     /**
@@ -35,8 +35,14 @@ class VideoRecorder(cameraView: CameraGLView) {
         }
     }
 
-    fun startRecording(width: Int, height: Int) {
-        mediaMuxer = MediaMuxerWrapper(FILE_EXT)
+    /**
+     * Starts recording.
+     *
+     * @param outputPath The file path where the output video file is saved.
+     *                   If null, the output video is saved under Environment.DIRECTORY_MOVIES.
+     */
+    fun startRecording(width: Int, height: Int, outputPath: String? = null) {
+        mediaMuxer = MediaMuxerWrapper(outputPath)
         VideoEncoder(mediaMuxer!!, mediaEncoderListener, width, height)
         AudioEncoder(mediaMuxer!!, mediaEncoderListener)
         mediaMuxer!!.prepare()

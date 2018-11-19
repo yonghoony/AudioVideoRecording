@@ -39,6 +39,7 @@ import android.util.Log;
 public class MediaMuxerWrapper {
 	private static final boolean DEBUG = false;	// TODO set false on release
 	private static final String TAG = "MediaMuxerWrapper";
+	private static final String EXT_MP4 = ".mp4";
 
 	private static final String DIR_NAME = "AVRecSample";
     private static final SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
@@ -51,16 +52,12 @@ public class MediaMuxerWrapper {
 
 	/**
 	 * Constructor
-	 * @param ext extension of output file
 	 * @throws IOException
 	 */
-	public MediaMuxerWrapper(String ext) throws IOException {
-		if (TextUtils.isEmpty(ext)) ext = ".mp4";
-		try {
-			mOutputPath = getCaptureFile(Environment.DIRECTORY_MOVIES, ext).toString();
-		} catch (final NullPointerException e) {
-			throw new RuntimeException("This app has no permission of writing external storage");
-		}
+	public MediaMuxerWrapper(String outputPath) throws IOException {
+		mOutputPath = TextUtils.isEmpty(outputPath)
+			? getCaptureFile(Environment.DIRECTORY_MOVIES, EXT_MP4).toString() : outputPath;
+		Log.d(TAG, "MediaMuxerWrapper outputPath=" + mOutputPath);
 		mMediaMuxer = new MediaMuxer(mOutputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 		mEncoderCount = mStatredCount = 0;
 		mIsStarted = false;
