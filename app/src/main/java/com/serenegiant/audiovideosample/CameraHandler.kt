@@ -27,7 +27,11 @@ class CameraHandler(private var thread: CameraThread?,
     private var isFrontFace: Boolean = false
 
     fun startPreview(width: Int, height: Int, cameraId: Int) {
-        post { performStartPreview(width, height, cameraId) }
+        if (width > height) {
+            post { performStartPreview(width, height, cameraId) }
+        } else {
+            post { performStartPreview(height, width, cameraId) }
+        }
     }
 
     /**
@@ -61,8 +65,8 @@ class CameraHandler(private var thread: CameraThread?,
     /**
      * start camera preview
      *
-     * @param width
-     * @param height
+     * @param width The longer side of the preview regardless of the orientation.
+     * @param height The shorter side of the preview regardless of the orientation.
      */
     private fun performStartPreview(width: Int, height: Int, cameraId: Int = Camera.CameraInfo.CAMERA_FACING_FRONT) {
         Log.v(TAG, "startPreview:")
