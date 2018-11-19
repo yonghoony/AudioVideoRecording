@@ -6,7 +6,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.serenegiant.encoder.MediaVideoEncoder;
+import com.serenegiant.encoder.VideoEncoder;
 import com.serenegiant.glutils.GLDrawer2D;
 
 import java.lang.ref.WeakReference;
@@ -28,7 +28,7 @@ final class CameraSurfaceRenderer
     private GLDrawer2D mDrawer;
     private final float[] mStMatrix = new float[16];
     private final float[] mMvpMatrix = new float[16];
-    private MediaVideoEncoder mVideoEncoder;
+    private VideoEncoder mVideoEncoder;
 
     public CameraSurfaceRenderer(final CameraGLView parent) {
         Log.v(TAG, "CameraSurfaceRenderer:");
@@ -60,7 +60,7 @@ final class CameraSurfaceRenderer
         mDrawer.setMatrix(mMvpMatrix, 0);
     }
 
-    public void setVideoEncoder(MediaVideoEncoder videoEncoder) {
+    public void setVideoEncoder(VideoEncoder videoEncoder) {
         mVideoEncoder = videoEncoder;
     }
 

@@ -6,7 +6,7 @@ package com.serenegiant.encoder
  *
  * Copyright (c) 2014-2015 saki t_saki@serenegiant.com
  *
- * File name: MediaVideoEncoder.java
+ * File name: VideoEncoder.java
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,14 +34,14 @@ import android.view.Surface
 
 import com.serenegiant.glutils.RenderHandler
 
-class MediaVideoEncoder(muxer: MediaMuxerWrapper,
-                        listener: MediaEncoder.MediaEncoderListener,
-                        private val width: Int,
-                        private val height: Int)
+class VideoEncoder(muxer: MediaMuxerWrapper,
+                   listener: MediaEncoder.MediaEncoderListener,
+                   private val width: Int,
+                   private val height: Int)
     : MediaEncoder(muxer, listener) {
 
     companion object {
-        private val TAG = "MediaVideoEncoder"
+        private val TAG = "VideoEncoder"
 
         private const val MIME_TYPE = "video/avc"
         // parameters for recording

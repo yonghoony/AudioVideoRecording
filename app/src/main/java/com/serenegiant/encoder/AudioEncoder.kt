@@ -6,7 +6,7 @@ package com.serenegiant.encoder
  *
  * Copyright (c) 2014-2015 saki t_saki@serenegiant.com
  *
- * File name: MediaAudioEncoder.java
+ * File name: AudioEncoder.java
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import android.media.MediaFormat
 import android.media.MediaRecorder
 import android.util.Log
 
-class MediaAudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoderListener)
+class AudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoderListener)
     : MediaEncoder(muxer, listener) {
 
     private var audioThread: AudioThread? = null
@@ -159,7 +159,7 @@ class MediaAudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEn
     }
 
     companion object {
-        private const val TAG = "MediaAudioEncoder"
+        private const val TAG = "AudioEncoder"
         private const val MIME_TYPE = "audio/mp4a-latm"
         private const val SAMPLE_RATE = 44100    // 44.1[KHz] is only setting guaranteed to be available on all devices.
         private const val BIT_RATE = 64000

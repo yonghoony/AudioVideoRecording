@@ -101,14 +101,14 @@ public class MediaMuxerWrapper {
 //**********************************************************************
 	/**
 	 * assign encoder to this calss. this is called from encoder.
-	 * @param encoder instance of MediaVideoEncoder or MediaAudioEncoder
+	 * @param encoder instance of VideoEncoder or AudioEncoder
 	 */
 	/*package*/ void addEncoder(final MediaEncoder encoder) {
-		if (encoder instanceof MediaVideoEncoder) {
+		if (encoder instanceof VideoEncoder) {
 			if (mVideoEncoder != null)
 				throw new IllegalArgumentException("Video encoder already added.");
 			mVideoEncoder = encoder;
-		} else if (encoder instanceof MediaAudioEncoder) {
+		} else if (encoder instanceof AudioEncoder) {
 			if (mAudioEncoder != null)
 				throw new IllegalArgumentException("Video encoder already added.");
 			mAudioEncoder = encoder;

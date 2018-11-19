@@ -31,7 +31,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.serenegiant.encoder.MediaVideoEncoder;
+import com.serenegiant.encoder.VideoEncoder;
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
@@ -150,7 +150,7 @@ public final class CameraGLView extends GLSurfaceView {
 		super.surfaceDestroyed(holder);
 	}
 
-	public void setVideoEncoder(final MediaVideoEncoder encoder) {
+	public void setVideoEncoder(final VideoEncoder encoder) {
 		Log.v(TAG, "setVideoEncoder:tex_id=" + mRenderer.hTex + ",encoder=" + encoder);
 		queueEvent(new Runnable() {
 			@Override

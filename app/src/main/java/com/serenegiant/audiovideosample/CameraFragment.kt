@@ -32,13 +32,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 
-import com.serenegiant.encoder.MediaAudioEncoder
-import com.serenegiant.encoder.MediaEncoder
-import com.serenegiant.encoder.MediaMuxerWrapper
-import com.serenegiant.encoder.MediaVideoEncoder
 import java.io.File
 import android.content.Intent
 import android.net.Uri
@@ -54,10 +48,7 @@ class CameraFragment : Fragment() {
         private const val TAG = "CameraFragment"
     }
 
-    /**
-     * muxer for audio/video recording
-     */
-    private var mediaMuxer: MediaMuxerWrapper? = null
+    private lateinit var videoRecorder: VideoRecorder
 
     /**
      * method when touch record button
@@ -69,27 +60,10 @@ class CameraFragment : Fragment() {
                 cameraView.scaleMode = scaleMode
                 updateScaleModeText()
             }
-            R.id.record_button -> if (mediaMuxer == null)
+            R.id.record_button -> if (!videoRecorder.isRecording())
                 startRecording()
             else
                 stopRecording()
-        }
-    }
-
-    /**
-     * callback methods from encoder
-     */
-    private val mMediaEncoderListener = object : MediaEncoder.MediaEncoderListener {
-        override fun onPrepared(encoder: MediaEncoder) {
-            Log.v(TAG, "onPrepared:encoder=$encoder")
-            if (encoder is MediaVideoEncoder)
-                cameraView.setVideoEncoder(encoder)
-        }
-
-        override fun onStopped(encoder: MediaEncoder) {
-            Log.v(TAG, "onStopped:encoder=$encoder")
-            if (encoder is MediaVideoEncoder)
-                cameraView.setVideoEncoder(null)
         }
     }
 
@@ -100,7 +74,6 @@ class CameraFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         cameraView.scaleMode = CameraGLView.SCALE_CROP_CENTER
 
         val display = activity.windowManager.defaultDisplay
@@ -111,6 +84,8 @@ class CameraFragment : Fragment() {
         switch_camera_button.setOnClickListener {
             cameraView.toggleCamera()
         }
+
+        videoRecorder = VideoRecorder(cameraView)
     }
 
     override fun onResume() {
@@ -146,19 +121,13 @@ class CameraFragment : Fragment() {
      */
     private fun startRecording() {
         Log.v(TAG, "startRecording:")
+
         try {
-            recordButton!!.setColorFilter(-0x10000)    // turn red
-            mediaMuxer = MediaMuxerWrapper(".mp4")    // if you record audio only, ".m4a" is also OK.
-
-//            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, cameraView.videoWidth, cameraView.videoHeight)
-            MediaVideoEncoder(mediaMuxer!!, mMediaEncoderListener, 414, 736)
-            MediaAudioEncoder(mediaMuxer!!, mMediaEncoderListener)
-
-            mediaMuxer!!.prepare()
-            mediaMuxer!!.startRecording()
+            recordButton.setColorFilter(-0x10000)
+            videoRecorder.startRecording(cameraView.measuredWidth, cameraView.measuredHeight)
         } catch (e: IOException) {
-            recordButton!!.setColorFilter(0)
-            Log.e(TAG, "startCapture:", e)
+            recordButton.setColorFilter(0)
+            Log.e(TAG, "Failed to start recording", e)
         }
     }
 
@@ -166,13 +135,11 @@ class CameraFragment : Fragment() {
      * request stop recording
      */
     private fun stopRecording() {
-        Log.v(TAG, "stopRecording:mediaMuxer=$mediaMuxer")
-        recordButton!!.setColorFilter(0)    // return to default color
+        Log.v(TAG, "stopRecording")
+        recordButton.setColorFilter(0)    // return to default color
 
-        mediaMuxer?.let {
-            it.stopRecording()
-            openVideo(it.outputPath)
-            mediaMuxer = null
+        videoRecorder.stopRecording()?.let {
+            openVideo(it)
         }
     }
 
