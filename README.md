@@ -1,4 +1,4 @@
-AudioVideoRecording
+Android Camcorder
 =========================
 
 This is a camera library that records audio and video by using [MediaCodec](https://developer.android.com/reference/android/media/MediaCodec) and [MediaMuxer](https://developer.android.com/reference/android/media/MediaMuxer). It is a fork of https://github.com/saki4510t/AudioVideoRecordingSample.
