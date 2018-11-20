@@ -1,11 +1,7 @@
-package com.serenegiant.audiovideosample
+package com.tape.camcorder.encoder
 
-import android.os.Environment
 import android.util.Log
-import com.serenegiant.encoder.AudioEncoder
-import com.serenegiant.encoder.MediaEncoder
-import com.serenegiant.encoder.MediaMuxerWrapper
-import com.serenegiant.encoder.VideoEncoder
+import com.tape.camcorder.views.CameraGLView
 
 class VideoRecorder(cameraView: CameraGLView) {
 

@@ -1,4 +1,4 @@
-package com.serenegiant.audiovideosample
+package com.tape.camcorder.demo
 
 /*
  * AudioVideoRecordingSample

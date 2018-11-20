@@ -1,4 +1,4 @@
-package com.serenegiant.encoder
+package com.tape.camcorder.encoder
 
 /*
  * AudioVideoRecordingSample

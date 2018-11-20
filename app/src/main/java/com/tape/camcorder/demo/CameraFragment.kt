@@ -1,4 +1,4 @@
-package com.serenegiant.audiovideosample
+package com.tape.camcorder.demo
 
 /*
  * AudioVideoRecordingSample
@@ -36,6 +36,8 @@ import android.view.ViewGroup
 import java.io.File
 import android.content.Intent
 import android.net.Uri
+import com.tape.camcorder.encoder.VideoRecorder
+import com.tape.camcorder.views.CameraGLView
 import kotlinx.android.synthetic.main.fragment_main.record_button as recordButton
 import kotlinx.android.synthetic.main.fragment_main.scalemode_textview as scaleModeTextView
 import kotlinx.android.synthetic.main.fragment_main.camera_view as cameraView

@@ -1,4 +1,4 @@
-package com.serenegiant.audiovideosample;
+package com.tape.camcorder.views;
 
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
@@ -6,8 +6,8 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.serenegiant.encoder.VideoEncoder;
-import com.serenegiant.glutils.GLDrawer2D;
+import com.tape.camcorder.encoder.VideoEncoder;
+import com.tape.camcorder.utils.GLDrawer2D;
 
 import java.lang.ref.WeakReference;
 
@@ -17,7 +17,7 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * GLSurfaceViewのRenderer
  */
-final class CameraSurfaceRenderer
+class CameraSurfaceRenderer
     implements GLSurfaceView.Renderer,
                 SurfaceTexture.OnFrameAvailableListener {	// API >= 11
     private static final String TAG = "CameraSurfaceRenderer";

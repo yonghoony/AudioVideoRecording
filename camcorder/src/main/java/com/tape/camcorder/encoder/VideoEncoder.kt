@@ -1,4 +1,4 @@
-package com.serenegiant.encoder
+package com.tape.camcorder.encoder
 
 /*
  * AudioVideoRecordingSample
@@ -32,7 +32,7 @@ import android.opengl.EGLContext
 import android.util.Log
 import android.view.Surface
 
-import com.serenegiant.glutils.RenderHandler
+import com.tape.camcorder.utils.RenderHandler
 
 class VideoEncoder(muxer: MediaMuxerWrapper,
                    listener: MediaEncoder.MediaEncoderListener,

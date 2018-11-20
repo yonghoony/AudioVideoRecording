@@ -1,4 +1,4 @@
-package com.serenegiant.encoder;
+package com.tape.camcorder.encoder;
 /*
  * AudioVideoRecordingSample
  * Sample project to cature audio and video from internal mic/camera and save as MPEG4 file.
@@ -36,13 +36,17 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.tape.camcorder.encoder.AudioEncoder;
+import com.tape.camcorder.encoder.VideoEncoder;
+
 public class MediaMuxerWrapper {
 	private static final boolean DEBUG = false;	// TODO set false on release
 	private static final String TAG = "MediaMuxerWrapper";
 	private static final String EXT_MP4 = ".mp4";
 
-	private static final String DIR_NAME = "AVRecSample";
-    private static final SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
+	private static final String DIR_NAME = "Camcorder";
+    private static final SimpleDateFormat mDateTimeFormat =
+		new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
 
 	private String mOutputPath;
 	private final MediaMuxer mMediaMuxer;	// API >= 18

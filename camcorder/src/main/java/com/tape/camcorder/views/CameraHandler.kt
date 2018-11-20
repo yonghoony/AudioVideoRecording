@@ -1,13 +1,13 @@
-package com.serenegiant.audiovideosample
+package com.tape.camcorder.views
 
 import android.content.Context
 import android.hardware.Camera
 import android.os.Handler
 import android.os.Looper
-import android.os.Message
 import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
+import com.tape.camcorder.utils.CameraUtils
 import java.io.IOException
 import java.lang.ref.WeakReference
 

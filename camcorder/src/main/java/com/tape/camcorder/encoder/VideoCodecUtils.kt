@@ -1,4 +1,4 @@
-package com.serenegiant.encoder
+package com.tape.camcorder.encoder
 
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList

@@ -1,4 +1,4 @@
-package com.serenegiant.audiovideosample;
+package com.tape.camcorder.views;
 /*
  * AudioVideoRecordingSample
  * Sample project to cature audio and video from internal mic/camera and save as MPEG4 file.
@@ -31,7 +31,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.serenegiant.encoder.VideoEncoder;
+import com.tape.camcorder.encoder.VideoEncoder;
+import com.tape.camcorder.views.CameraHandler;
+import com.tape.camcorder.views.CameraThread;
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface

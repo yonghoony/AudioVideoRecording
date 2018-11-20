@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.tape.camcorder.utils;
 /*
  * AudioVideoRecordingSample
  * Sample project to cature audio and video from internal mic/camera and save as MPEG4 file.

@@ -28,10 +28,10 @@
     android:id="@+id/RelativeLayout1"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    tools:context="com.serenegiant.audiovideosample.CameraFragment"
+    tools:context="com.tape.camcorder.demo.CameraFragment"
     >
 
-    <com.serenegiant.audiovideosample.CameraGLView
+    <com.tape.camcorder.views.CameraGLView
         android:id="@+id/camera_view"
         android:layout_centerInParent="true"
         android:layout_height="match_parent"
