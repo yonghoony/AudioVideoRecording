@@ -36,7 +36,8 @@ class MainActivity : Activity() {
 
         if (savedInstanceState == null) {
             fragmentManager.beginTransaction()
-                .add(R.id.container, CameraFragment()).commit()
+                .add(R.id.container, CameraFragment())
+                .commit()
         }
     }
 
@@ -48,9 +49,6 @@ class MainActivity : Activity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
         return if (id == R.id.action_settings) {
             true

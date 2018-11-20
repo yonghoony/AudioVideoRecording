@@ -48,6 +48,7 @@ class CameraFragment : Fragment() {
 
     companion object {
         private const val TAG = "CameraFragment"
+        private const val COLOR_FILTER_RED = -0x10000
     }
 
     private lateinit var videoRecorder: VideoRecorder
@@ -107,13 +108,15 @@ class CameraFragment : Fragment() {
         val scaleMode = cameraView.scaleMode
         scaleModeTextView.text =
             when (scaleMode) {
-                0 -> "scale to fit"
-                1 -> "keep aspect(viewport)"
-                2 -> "keep aspect(matrix)"
-                3 -> "keep aspect(crop center)"
+                0 -> "Scale to fit"
+                1 -> "Keep aspect(viewport)"
+                2 -> "Keep aspect(matrix)"
+                3 -> "Keep aspect(crop center)"
                 else -> ""
             }
     }
+
+
 
     /**
      * start resorcing
@@ -125,7 +128,7 @@ class CameraFragment : Fragment() {
         Log.v(TAG, "startRecording:")
 
         try {
-            recordButton.setColorFilter(-0x10000)
+            recordButton.setColorFilter(COLOR_FILTER_RED)
             videoRecorder.startRecording(cameraView.measuredWidth, cameraView.measuredHeight)
         } catch (e: IOException) {
             recordButton.setColorFilter(0)
