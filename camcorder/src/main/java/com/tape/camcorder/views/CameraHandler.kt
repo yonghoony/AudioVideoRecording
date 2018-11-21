@@ -153,7 +153,7 @@ class CameraHandler(private var thread: CameraThread?,
             camera = null
         }
         val parent = cameraViewRef.get() ?: return
-        parent.mCameraHandler = null
+        parent.cameraHandler = null
     }
 
     /**
@@ -190,8 +190,6 @@ class CameraHandler(private var thread: CameraThread?,
         }
         // apply rotation setting
         camera!!.setDisplayOrientation(degrees)
-        parent.setRotation(degrees)
-        // XXX This method fails to call and camera stops working on some devices.
-        //			params.setRotation(degrees);
+        parent.rotationDegrees = degrees
     }
 }
