@@ -93,6 +93,8 @@ public abstract class MediaEncoder implements Runnable {
         synchronized (mSync) {
             // create BufferInfo here for effectiveness(to reduce GC)
             mBufferInfo = new MediaCodec.BufferInfo();
+            // TODO(yonghoon): For experiment only. Remove this later.
+            mBufferInfo.size = 0;
             // wait for starting thread
             new Thread(this, getClass().getSimpleName()).start();
             try {
