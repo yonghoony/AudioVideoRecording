@@ -31,10 +31,9 @@ import android.media.MediaFormat;
 import android.util.Log;
 
 public abstract class MediaEncoder implements Runnable {
-	private static final boolean DEBUG = false;	// TODO set false on release
 	private static final String TAG = "MediaEncoder";
 
-	protected static final int TIMEOUT_USEC = 10000;	// 10[msec]
+	protected static final long TIMEOUT_USEC = 10000L;	// 10[msec]
 	protected static final int MSG_FRAME_AVAILABLE = 1;
 	protected static final int MSG_STOP_RECORDING = 9;
 
@@ -93,8 +92,6 @@ public abstract class MediaEncoder implements Runnable {
         synchronized (mSync) {
             // create BufferInfo here for effectiveness(to reduce GC)
             mBufferInfo = new MediaCodec.BufferInfo();
-            // TODO(yonghoon): For experiment only. Remove this later.
-            mBufferInfo.size = 0;
             // wait for starting thread
             new Thread(this, getClass().getSimpleName()).start();
             try {
@@ -114,7 +111,6 @@ public abstract class MediaEncoder implements Runnable {
      * @return return true if encoder is ready to encod.
      */
     public boolean frameAvailableSoon() {
-//    	if (DEBUG) Log.v(TAG, "frameAvailableSoon");
         synchronized (mSync) {
             if (!mIsCapturing || mRequestStop) {
                 return false;
@@ -168,7 +164,7 @@ public abstract class MediaEncoder implements Runnable {
 	        	}
         	}
         } // end of while
-		if (DEBUG) Log.d(TAG, "Encoder thread exiting");
+        Log.d(TAG, "Encoder thread exiting");
         synchronized (mSync) {
         	mRequestStop = true;
             mIsCapturing = false;
@@ -183,7 +179,7 @@ public abstract class MediaEncoder implements Runnable {
    /*package*/ abstract void prepare() throws IOException;
 
 	/*package*/ void startRecording() {
-   	if (DEBUG) Log.v(TAG, "startRecording");
+   	Log.v(TAG, "startRecording");
 		synchronized (mSync) {
 			mIsCapturing = true;
 			mRequestStop = false;
@@ -195,7 +191,7 @@ public abstract class MediaEncoder implements Runnable {
     * the method to request stop encoding
     */
 	/*package*/ void stopRecording() {
-		if (DEBUG) Log.v(TAG, "stopRecording");
+		Log.v(TAG, "stopRecording");
 		synchronized (mSync) {
 			if (!mIsCapturing || mRequestStop) {
 				return;
@@ -213,7 +209,7 @@ public abstract class MediaEncoder implements Runnable {
      * Release all releated objects
      */
     protected void release() {
-		if (DEBUG) Log.d(TAG, "release:");
+		Log.d(TAG, "release:");
 		try {
 			mListener.onStopped(this);
 		} catch (final Exception e) {
@@ -243,7 +239,7 @@ public abstract class MediaEncoder implements Runnable {
     }
 
     protected void signalEndOfInputStream() {
-		if (DEBUG) Log.d(TAG, "sending EOS to encoder");
+		Log.d(TAG, "sending EOS to encoder");
         // signalEndOfInputStream is only avairable for video encoding with surface
         // and equivalent sending a empty buffer with BUFFER_FLAG_END_OF_STREAM flag.
 //		mMediaCodec.signalEndOfInputStream();	// API >= 18
@@ -258,6 +254,10 @@ public abstract class MediaEncoder implements Runnable {
      */
     protected void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs) {
     	if (!mIsCapturing) return;
+
+    	boolean isAudio = this instanceof AudioEncoder;
+
+    	Log.e(TAG, "##### encode isAudio=" + isAudio + " length=" + length + " presentationTimeUs=" + presentationTimeUs);
         final ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
         while (mIsCapturing) {
 	        final int inputBufferIndex = mMediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
@@ -267,11 +267,11 @@ public abstract class MediaEncoder implements Runnable {
 	            if (buffer != null) {
 	            	inputBuffer.put(buffer);
 	            }
-//	            if (DEBUG) Log.v(TAG, "encode:queueInputBuffer");
+//	            Log.v(TAG, "encode:queueInputBuffer");
 	            if (length <= 0) {
 	            	// send EOS
 	            	mIsEOS = true;
-	            	if (DEBUG) Log.i(TAG, "send BUFFER_FLAG_END_OF_STREAM");
+	            	Log.i(TAG, "send BUFFER_FLAG_END_OF_STREAM");
 	            	mMediaCodec.queueInputBuffer(inputBufferIndex, 0, 0,
 	            		presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
 		            break;
@@ -311,11 +311,11 @@ LOOP:	while (mIsCapturing) {
                 		break LOOP;		// out of while
                 }
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
+            	Log.v(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
                 // this shoud not come when encoding
                 encoderOutputBuffers = mMediaCodec.getOutputBuffers();
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_FORMAT_CHANGED");
+            	Log.v(TAG, "INFO_OUTPUT_FORMAT_CHANGED");
             	// this status indicate the output format of codec is changed
                 // this should come only once before actual encoded data
             	// but this status never come on Android4.3 or less
@@ -341,7 +341,7 @@ LOOP:	while (mIsCapturing) {
                	}
             } else if (encoderStatus < 0) {
             	// unexpected status
-            	if (DEBUG) Log.w(TAG, "drain:unexpected result from encoder#dequeueOutputBuffer: " + encoderStatus);
+            	Log.w(TAG, "drain:unexpected result from encoder#dequeueOutputBuffer: " + encoderStatus);
             } else {
                 final ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
                 if (encodedData == null) {
@@ -353,7 +353,7 @@ LOOP:	while (mIsCapturing) {
                 	// but MediaCodec#getOutputFormat can not call here(because INFO_OUTPUT_FORMAT_CHANGED don't come yet)
                 	// therefor we should expand and prepare output format from buffer data.
                 	// This sample is for API>=18(>=Android 4.3), just ignore this flag here
-					if (DEBUG) Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
+					Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
 					mBufferInfo.size = 0;
                 }
 

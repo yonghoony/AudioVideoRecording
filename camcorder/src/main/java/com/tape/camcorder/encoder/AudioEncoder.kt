@@ -55,7 +55,7 @@ class AudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoder
         Log.i(TAG, "selected codec: " + audioCodecInfo.name)
 
         val audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, SAMPLE_RATE, 1)
-        audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
+        audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE)
         audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_MONO)
         audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE)
         audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1)
@@ -162,9 +162,10 @@ class AudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoder
         private const val TAG = "AudioEncoder"
         private const val MIME_TYPE = "audio/mp4a-latm"
         private const val SAMPLE_RATE = 44100    // 44.1[KHz] is only setting guaranteed to be available on all devices.
-        private const val BIT_RATE = 64000
+        private const val BIT_RATE = 128 * 1024 // Used to be 64000
         const val SAMPLES_PER_FRAME = 1024    // AAC, bytes/frame/channel
         const val FRAMES_PER_BUFFER = 25    // AAC, frame/buffer/sec
+        private const val OUTPUT_AUDIO_AAC_PROFILE = MediaCodecInfo.CodecProfileLevel.AACObjectHE // Used to be MediaCodecInfo.CodecProfileLevel.AACObjectLC
 
         private val AUDIO_SOURCES = intArrayOf(MediaRecorder.AudioSource.MIC, MediaRecorder.AudioSource.DEFAULT, MediaRecorder.AudioSource.CAMCORDER, MediaRecorder.AudioSource.VOICE_COMMUNICATION, MediaRecorder.AudioSource.VOICE_RECOGNITION)
 
@@ -176,7 +177,6 @@ class AudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoder
         private fun selectAudioCodec(mimeType: String): MediaCodecInfo? {
             Log.v(TAG, "selectAudioCodec:")
 
-            var result: MediaCodecInfo? = null
             // get the list of available codecs
             val numCodecs = MediaCodecList.getCodecCount()
             LOOP@ for (i in 0 until numCodecs) {
@@ -188,14 +188,11 @@ class AudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoder
                 for (j in types.indices) {
                     Log.i(TAG, "supportedType:" + codecInfo.name + ",MIME=" + types[j])
                     if (types[j].equals(mimeType, ignoreCase = true)) {
-                        if (result == null) {
-                            result = codecInfo
-                            break@LOOP
-                        }
+                        return codecInfo
                     }
                 }
             }
-            return result
+            return null
         }
     }
 

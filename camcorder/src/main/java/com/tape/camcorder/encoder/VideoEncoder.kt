@@ -43,7 +43,7 @@ class VideoEncoder(muxer: MediaMuxerWrapper,
     companion object {
         private val TAG = "VideoEncoder"
 
-        private const val MIME_TYPE = "video/avc"
+        private const val MIME_TYPE = "video/avc" // H.264 Advanced Video Coding
         // parameters for recording
         private const val FRAME_RATE = 25
         private const val BPP = 0.25f
