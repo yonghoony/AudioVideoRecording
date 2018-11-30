@@ -256,8 +256,6 @@ public abstract class MediaEncoder implements Runnable {
     	if (!mIsCapturing) return;
 
     	boolean isAudio = this instanceof AudioEncoder;
-
-    	Log.e(TAG, "##### encode isAudio=" + isAudio + " length=" + length + " presentationTimeUs=" + presentationTimeUs);
         final ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
         while (mIsCapturing) {
 	        final int inputBufferIndex = mMediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
@@ -267,7 +265,6 @@ public abstract class MediaEncoder implements Runnable {
 	            if (buffer != null) {
 	            	inputBuffer.put(buffer);
 	            }
-//	            Log.v(TAG, "encode:queueInputBuffer");
 	            if (length <= 0) {
 	            	// send EOS
 	            	mIsEOS = true;
@@ -396,5 +393,4 @@ LOOP:	while (mIsCapturing) {
 			result = (prevOutputPTSUs - result) + result;
 		return result;
     }
-
 }
