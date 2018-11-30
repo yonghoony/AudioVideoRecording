@@ -58,7 +58,7 @@ class CameraFragment : Fragment() {
      */
     private val onClickListener = OnClickListener { view ->
         when (view.id) {
-            R.id.camera_view -> {
+            R.id.scalemode_textview -> {
                 val scaleMode = (cameraView.scaleMode + 1) % 4
                 cameraView.scaleMode = scaleMode
                 updateScaleModeText()
@@ -81,7 +81,7 @@ class CameraFragment : Fragment() {
 
         val display = activity.windowManager.defaultDisplay
         cameraView.setVideoSize(display.width, display.height)
-        cameraView.setOnClickListener(onClickListener)
+        scaleModeTextView.setOnClickListener(onClickListener)
         updateScaleModeText()
         recordButton.setOnClickListener(onClickListener)
         switch_camera_button.setOnClickListener {
@@ -109,9 +109,9 @@ class CameraFragment : Fragment() {
         scaleModeTextView.text =
             when (scaleMode) {
                 0 -> "Scale to fit"
-                1 -> "Keep aspect(viewport)"
-                2 -> "Keep aspect(matrix)"
-                3 -> "Keep aspect(crop center)"
+                1 -> "Keep aspect (viewport)"
+                2 -> "Keep aspect (matrix)"
+                3 -> "Keep aspect (crop center)"
                 else -> ""
             }
     }
