@@ -87,7 +87,7 @@ class VideoEncoder(muxer: MediaMuxerWrapper,
             Log.e(TAG, "Unable to find an appropriate codec for $MIME_TYPE")
             return
         }
-        Log.i(TAG, "selected codec: " + videoCodecInfo.name)
+        Log.i(TAG, "selected codec: ${videoCodecInfo.name}")
 
         val format = MediaFormat.createVideoFormat(MIME_TYPE, width, height)
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)    // API >= 18
@@ -131,7 +131,8 @@ class VideoEncoder(muxer: MediaMuxerWrapper,
 
     private fun calcBitRate(): Int {
         val bitrate = (BPP * FRAME_RATE.toFloat() * width.toFloat() * height.toFloat()).toInt()
-        Log.i(TAG, String.format("bitrate=%5.2f[Mbps]", bitrate.toFloat() / 1024f / 1024f))
+        val bitrateMbps = bitrate.toFloat() / 1024f / 1024f
+        Log.i(TAG, "bitrate=%5.2f[Mbps]".format(bitrateMbps))
         return bitrate
     }
 

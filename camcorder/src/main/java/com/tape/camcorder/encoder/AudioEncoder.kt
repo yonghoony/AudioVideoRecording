@@ -38,6 +38,44 @@ import android.util.Log
 class AudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoderListener)
     : MediaEncoder(muxer, listener) {
 
+    companion object {
+        private const val TAG = "AudioEncoder"
+        private const val MIME_TYPE = "audio/mp4a-latm"
+        private const val SAMPLE_RATE = 44100    // 44.1[KHz] is only setting guaranteed to be available on all devices.
+        private const val BIT_RATE = 128 * 1024 // Used to be 64000
+        private const val SAMPLES_PER_FRAME = 1024    // AAC, bytes/frame/channel
+        private const val FRAMES_PER_BUFFER = 25    // AAC, frame/buffer/sec
+        private const val OUTPUT_AUDIO_AAC_PROFILE = MediaCodecInfo.CodecProfileLevel.AACObjectHE // Used to be MediaCodecInfo.CodecProfileLevel.AACObjectLC
+
+        private val AUDIO_SOURCES = intArrayOf(MediaRecorder.AudioSource.MIC, MediaRecorder.AudioSource.DEFAULT, MediaRecorder.AudioSource.CAMCORDER, MediaRecorder.AudioSource.VOICE_COMMUNICATION, MediaRecorder.AudioSource.VOICE_RECOGNITION)
+
+        /**
+         * select the first codec that match a specific MIME type
+         * @param mimeType
+         * @return
+         */
+        private fun selectAudioCodec(mimeType: String): MediaCodecInfo? {
+            Log.v(TAG, "selectAudioCodec:")
+
+            // get the list of available codecs
+            val numCodecs = MediaCodecList.getCodecCount()
+            LOOP@ for (i in 0 until numCodecs) {
+                val codecInfo = MediaCodecList.getCodecInfoAt(i)
+                if (!codecInfo.isEncoder) {    // skipp decoder
+                    continue
+                }
+                val types = codecInfo.supportedTypes
+                for (j in types.indices) {
+                    Log.i(TAG, "supportedType:" + codecInfo.name + ",MIME=" + types[j])
+                    if (types[j].equals(mimeType, ignoreCase = true)) {
+                        return codecInfo
+                    }
+                }
+            }
+            return null
+        }
+    }
+
     private var audioThread: AudioThread? = null
 
     @Throws(IOException::class)
@@ -52,7 +90,7 @@ class AudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoder
             Log.e(TAG, "Unable to find an appropriate codec for $MIME_TYPE")
             return
         }
-        Log.i(TAG, "selected codec: " + audioCodecInfo.name)
+        Log.i(TAG, "selected codec: ${audioCodecInfo.name}")
 
         val audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, SAMPLE_RATE, 1)
         audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE)
@@ -155,44 +193,6 @@ class AudioEncoder(muxer: MediaMuxerWrapper, listener: MediaEncoder.MediaEncoder
             }
 
             Log.v(TAG, "AudioThread:finished")
-        }
-    }
-
-    companion object {
-        private const val TAG = "AudioEncoder"
-        private const val MIME_TYPE = "audio/mp4a-latm"
-        private const val SAMPLE_RATE = 44100    // 44.1[KHz] is only setting guaranteed to be available on all devices.
-        private const val BIT_RATE = 128 * 1024 // Used to be 64000
-        const val SAMPLES_PER_FRAME = 1024    // AAC, bytes/frame/channel
-        const val FRAMES_PER_BUFFER = 25    // AAC, frame/buffer/sec
-        private const val OUTPUT_AUDIO_AAC_PROFILE = MediaCodecInfo.CodecProfileLevel.AACObjectHE // Used to be MediaCodecInfo.CodecProfileLevel.AACObjectLC
-
-        private val AUDIO_SOURCES = intArrayOf(MediaRecorder.AudioSource.MIC, MediaRecorder.AudioSource.DEFAULT, MediaRecorder.AudioSource.CAMCORDER, MediaRecorder.AudioSource.VOICE_COMMUNICATION, MediaRecorder.AudioSource.VOICE_RECOGNITION)
-
-        /**
-         * select the first codec that match a specific MIME type
-         * @param mimeType
-         * @return
-         */
-        private fun selectAudioCodec(mimeType: String): MediaCodecInfo? {
-            Log.v(TAG, "selectAudioCodec:")
-
-            // get the list of available codecs
-            val numCodecs = MediaCodecList.getCodecCount()
-            LOOP@ for (i in 0 until numCodecs) {
-                val codecInfo = MediaCodecList.getCodecInfoAt(i)
-                if (!codecInfo.isEncoder) {    // skipp decoder
-                    continue
-                }
-                val types = codecInfo.supportedTypes
-                for (j in types.indices) {
-                    Log.i(TAG, "supportedType:" + codecInfo.name + ",MIME=" + types[j])
-                    if (types[j].equals(mimeType, ignoreCase = true)) {
-                        return codecInfo
-                    }
-                }
-            }
-            return null
         }
     }
 
