@@ -1,10 +1,12 @@
 package com.tape.camcorder.views
 
 import android.content.Context
+import android.graphics.Rect
 import android.hardware.Camera
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.MotionEvent
 import android.view.Surface
 import android.view.WindowManager
 import com.tape.camcorder.utils.CameraUtils
@@ -20,6 +22,7 @@ class CameraHandler(private var thread: CameraThread?,
     companion object {
         private val TAG = "CameraHandler"
         private const val MSG_PREVIEW_STOP = 2
+        private const val FOCUS_AREA_WEIGHT = 1000
     }
 
     private val lock = java.lang.Object()
@@ -62,6 +65,27 @@ class CameraHandler(private var thread: CameraThread?,
         }
     }
 
+    fun focus(focusRect: Rect) {
+        post {
+            Log.d(TAG, "focus() focusRect=$focusRect")
+            camera?.let {
+                it.cancelAutoFocus()
+                val focusList = mutableListOf(Camera.Area(focusRect, FOCUS_AREA_WEIGHT))
+                val parameters = it.parameters
+                if (parameters.maxNumMeteringAreas > 0) {
+                    parameters.meteringAreas = focusList
+                }
+                if (parameters.maxNumFocusAreas > 0) {
+                    parameters.focusAreas = focusList
+                }
+                it.parameters = parameters
+                it.autoFocus { success, camera ->
+                    Log.d(TAG, "autoFocus success=$success")
+                }
+            }
+        }
+    }
+
     /**
      * start camera preview
      *
@@ -77,7 +101,6 @@ class CameraHandler(private var thread: CameraThread?,
             try {
                 camera = Camera.open(cameraId)
                 val params = camera!!.parameters
-
                 val focusModes = params.supportedFocusModes
                 if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
                     params.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO

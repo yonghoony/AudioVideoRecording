@@ -36,6 +36,7 @@ import android.view.ViewGroup
 import java.io.File
 import android.content.Intent
 import android.net.Uri
+import android.view.MotionEvent
 import com.tape.camcorder.encoder.VideoRecorder
 import com.tape.camcorder.views.CameraGLView
 import kotlinx.android.synthetic.main.fragment_main.record_button as recordButton
@@ -86,6 +87,13 @@ class CameraFragment : Fragment() {
         recordButton.setOnClickListener(onClickListener)
         switch_camera_button.setOnClickListener {
             cameraView.toggleCamera()
+        }
+
+        cameraView.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                cameraView.focusOnTouch(event)
+            }
+            false
         }
 
         videoRecorder = VideoRecorder(cameraView)
