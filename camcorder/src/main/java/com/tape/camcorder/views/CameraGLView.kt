@@ -147,8 +147,8 @@ class CameraGLView @JvmOverloads constructor(context: Context, attrs: AttributeS
         }
     }
 
-    fun focusOnTouch(event: MotionEvent) {
-        cameraHandler?.focus(getFocusArea(event))
+    fun focusOnTouch(x: Float, y: Float) {
+        cameraHandler?.focus(getFocusArea(x, y))
     }
 
     private fun stopPreview(needWait: Boolean) {
@@ -158,9 +158,9 @@ class CameraGLView @JvmOverloads constructor(context: Context, attrs: AttributeS
     /**
      * Maps the position ratio to the coordinates ranging from -1000 to 1000.
      */
-    private fun getFocusArea(touchEvent: MotionEvent): Rect {
-        val xRatio = touchEvent.y / height
-        val yRatio = (width - touchEvent.x) / width
+    private fun getFocusArea(touchEventX: Float, touchEventY: Float): Rect {
+        val xRatio = touchEventY / height
+        val yRatio = (width - touchEventX) / width
 
         val focusAreaX = FOCUS_AREA_COORDINATE_RANGE * xRatio - FOCUS_AREA_COORDINATE_MAX
         val focusAreaY = FOCUS_AREA_COORDINATE_RANGE * yRatio - FOCUS_AREA_COORDINATE_MAX
@@ -171,7 +171,7 @@ class CameraGLView @JvmOverloads constructor(context: Context, attrs: AttributeS
         focusArea.top = (focusAreaY - FOCUS_AREA_RADIUS).validCoordinate
         focusArea.bottom = (focusAreaY + FOCUS_AREA_RADIUS).validCoordinate
 
-        Log.d(TAG, "getFocusArea touchEvent[${touchEvent.x}, ${touchEvent.y}]" +
+        Log.d(TAG, "getFocusArea touchEvent[$touchEventX, $touchEventY]" +
             " ratio=[$xRatio, $yRatio] focusArea=$focusArea")
         return focusArea
     }

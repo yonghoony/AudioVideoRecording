@@ -91,7 +91,7 @@ class CameraFragment : Fragment() {
 
         cameraView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                cameraView.focusOnTouch(event)
+                cameraView.focusOnTouch(event.x, event.y)
             }
             false
         }
@@ -123,8 +123,6 @@ class CameraFragment : Fragment() {
                 else -> ""
             }
     }
-
-
 
     /**
      * start resorcing
