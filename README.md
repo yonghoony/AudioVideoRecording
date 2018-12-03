@@ -15,7 +15,7 @@ repositories {
 
 ```
 dependencies {
-    implementation 'com.github.yonghoony:Camcorder:v0.0.5'
+    implementation 'com.github.yonghoony:Camcorder:v0.0.8'
 }
 ```
 
