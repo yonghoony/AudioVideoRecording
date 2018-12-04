@@ -6,7 +6,6 @@ import android.hardware.Camera
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.MotionEvent
 import android.view.Surface
 import android.view.WindowManager
 import com.tape.camcorder.utils.CameraUtils
@@ -69,20 +68,55 @@ class CameraHandler(private var thread: CameraThread?,
         post {
             Log.d(TAG, "focus() focusRect=$focusRect")
             camera?.let {
-                it.cancelAutoFocus()
                 val focusList = mutableListOf(Camera.Area(focusRect, FOCUS_AREA_WEIGHT))
                 val parameters = it.parameters
+                Log.d(TAG, "maxNumMeteringAreas=${parameters.maxNumMeteringAreas}" +
+                    " maxNumFocusAreas=${parameters.maxNumFocusAreas}")
                 if (parameters.maxNumMeteringAreas > 0) {
                     parameters.meteringAreas = focusList
+
+                    it.parameters = parameters
                 }
                 if (parameters.maxNumFocusAreas > 0) {
                     parameters.focusAreas = focusList
-                }
-                it.parameters = parameters
-                it.autoFocus { success, camera ->
-                    Log.d(TAG, "autoFocus success=$success")
+                    requestAutoFocusIfSupported(it)
                 }
             }
+        }
+    }
+
+    private fun requestAutoFocusIfSupported(camera: Camera) {
+        if (camera.parameters.supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+            camera.cancelAutoFocus()
+            val parameters = camera.parameters
+            parameters.focusMode = Camera.Parameters.FOCUS_MODE_AUTO
+            camera.parameters = parameters
+            camera.autoFocus { success, camera ->
+                Log.d(TAG, "autoFocus success=$success")
+
+                if (!success) {
+                    // Fall back to the default focus mode if it fails to auto-focus.
+                    parameters.focusMode = getDefaultFocusMode(parameters)
+                    camera.parameters = parameters
+                }
+            }
+        }
+    }
+
+    private fun getDefaultFocusMode(params: Camera.Parameters): String? {
+        var defaultFocusMode: String? = null
+        try {
+            val supportedFocusModes: List<String> = params.supportedFocusModes
+            if (supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+                defaultFocusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO
+            } else if (supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                defaultFocusMode = Camera.Parameters.FOCUS_MODE_AUTO
+            } else {
+                Log.i(TAG, "Camera does not support autofocus")
+            }
+        } finally {
+            Log.d(TAG, "defaultFocusMode=$defaultFocusMode")
+            return defaultFocusMode
         }
     }
 
@@ -101,13 +135,8 @@ class CameraHandler(private var thread: CameraThread?,
             try {
                 camera = Camera.open(cameraId)
                 val params = camera!!.parameters
-                val focusModes = params.supportedFocusModes
-                if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
-                    params.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO
-                } else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-                    params.focusMode = Camera.Parameters.FOCUS_MODE_AUTO
-                } else {
-                    Log.i(TAG, "Camera does not support autofocus")
+                getDefaultFocusMode(params)?.let {
+                    params.focusMode = it
                 }
                 // let's try fastest frame rate. You will get near 60fps, but your device become hot.
                 val supportedFpsRange = params.supportedPreviewFpsRange

@@ -24,23 +24,42 @@ package com.tape.camcorder.views
 */
 
 import android.content.Context
+import android.graphics.Rect
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
 import android.opengl.EGL14
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.util.Log
-import android.view.MotionEvent
 import android.view.SurfaceHolder
-
 import com.tape.camcorder.encoder.VideoEncoder
-import android.graphics.Rect
 
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
  */
 class CameraGLView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : GLSurfaceView(context, attrs) {
+
+    companion object {
+
+        private val TAG = "CameraGLView"
+
+        private const val FOCUS_AREA_COORDINATE_MAX = 1000F
+        private const val FOCUS_AREA_COORDINATE_RANGE = FOCUS_AREA_COORDINATE_MAX * 2F
+        private const val FOCUS_AREA_RADIUS = FOCUS_AREA_COORDINATE_MAX * 0.1F
+
+        const val SCALE_STRETCH_FIT = 0
+        const val SCALE_KEEP_ASPECT_VIEWPORT = 1
+        const val SCALE_KEEP_ASPECT = 2
+        const val SCALE_CROP_CENTER = 3
+
+        private val Float.validCoordinate: Int
+            get() {
+                return Math.max(
+                    Math.min(this, FOCUS_AREA_COORDINATE_MAX), -FOCUS_AREA_COORDINATE_MAX
+                ).toInt()
+            }
+    }
 
     private val lock = Any()
     private val renderer: CameraSurfaceRenderer?
@@ -174,26 +193,5 @@ class CameraGLView @JvmOverloads constructor(context: Context, attrs: AttributeS
         Log.d(TAG, "getFocusArea touchEvent[$touchEventX, $touchEventY]" +
             " ratio=[$xRatio, $yRatio] focusArea=$focusArea")
         return focusArea
-    }
-
-    companion object {
-
-        private val TAG = "CameraGLView"
-
-        private const val FOCUS_AREA_COORDINATE_MAX = 1000F
-        private const val FOCUS_AREA_COORDINATE_RANGE = FOCUS_AREA_COORDINATE_MAX * 2F
-        private const val FOCUS_AREA_RADIUS = FOCUS_AREA_COORDINATE_MAX * 0.1F
-
-        const val SCALE_STRETCH_FIT = 0
-        const val SCALE_KEEP_ASPECT_VIEWPORT = 1
-        const val SCALE_KEEP_ASPECT = 2
-        const val SCALE_CROP_CENTER = 3
-
-        private val Float.validCoordinate: Int
-            get() {
-                return Math.max(
-                    Math.min(this, FOCUS_AREA_COORDINATE_MAX), -FOCUS_AREA_COORDINATE_MAX
-                ).toInt()
-            }
     }
 }
