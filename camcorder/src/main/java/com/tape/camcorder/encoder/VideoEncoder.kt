@@ -41,13 +41,12 @@ class VideoEncoder(muxer: MediaMuxerWrapper,
     : MediaEncoder(muxer, listener) {
 
     companion object {
-        private val TAG = "VideoEncoder"
-
+        private const val TAG = "VideoEncoder"
         private const val MIME_TYPE = "video/avc" // H.264 Advanced Video Coding
         // parameters for recording
         private const val FRAME_RATE = 25
+        private const val I_FRAME_INTERVAL = 10
         private const val BPP = 0.25f
-
     }
 
     private val videoCodecUtils by lazy { VideoCodecUtils() }
@@ -93,11 +92,12 @@ class VideoEncoder(muxer: MediaMuxerWrapper,
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)    // API >= 18
         format.setInteger(MediaFormat.KEY_BIT_RATE, calcBitRate())
         format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE)
-        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 10)
+        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, I_FRAME_INTERVAL)
         Log.i(TAG, "format: $format")
 
         mMediaCodec = MediaCodec.createEncoderByType(MIME_TYPE)
         mMediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        mMediaCodec.setVideoScalingMode(MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
         // get Surface for encoder input
         // this method only can call between #configure and #start
         surface = mMediaCodec.createInputSurface()    // API >= 18
