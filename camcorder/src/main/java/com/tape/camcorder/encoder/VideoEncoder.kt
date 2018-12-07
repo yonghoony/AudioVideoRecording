@@ -46,7 +46,9 @@ class VideoEncoder(muxer: MediaMuxerWrapper,
         // parameters for recording
         private const val FRAME_RATE = 25
         private const val I_FRAME_INTERVAL = 10
-        private const val BPP = 0.25f
+        // TODO(yonghoon): Make BPP configurable outside the library.
+//        private const val BPP = 0.25f
+        private const val BPP = 0.10f
     }
 
     private val videoCodecUtils by lazy { VideoCodecUtils() }
@@ -130,10 +132,10 @@ class VideoEncoder(muxer: MediaMuxerWrapper,
     }
 
     private fun calcBitRate(): Int {
-        val bitrate = (BPP * FRAME_RATE.toFloat() * width.toFloat() * height.toFloat()).toInt()
-        val bitrateMbps = bitrate.toFloat() / 1024f / 1024f
+        val bitrate = BPP * FRAME_RATE.toFloat() * width.toFloat() * height.toFloat()
+        val bitrateMbps = bitrate / 1024f / 1024f
         Log.i(TAG, "bitrate=%5.2f[Mbps]".format(bitrateMbps))
-        return bitrate
+        return bitrate.toInt()
     }
 
     override fun signalEndOfInputStream() {

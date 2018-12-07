@@ -156,7 +156,7 @@ class CameraFragment : Fragment() {
 
     private fun openVideo(videoPath: String?) {
         videoPath?.let {
-            Log.d(TAG, "outputFile ${it} size=${File(it).length() / 1024 / 1024} MB")
+            Log.d(TAG, "outputFile ${it} size=${File(it).length().toDouble() / 1024 / 1024} MB")
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
                 .setDataAndType(Uri.parse(it), "video/mp4")
             startActivity(intent)
