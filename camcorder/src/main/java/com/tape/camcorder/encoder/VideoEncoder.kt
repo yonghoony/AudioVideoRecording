@@ -48,7 +48,7 @@ class VideoEncoder(muxer: MediaMuxerWrapper,
         private const val I_FRAME_INTERVAL = 10
         // TODO(yonghoon): Make BPP configurable outside the library.
 //        private const val BPP = 0.25f
-        private const val BPP = 0.10f
+        private const val BPP = 0.18f
     }
 
     private val videoCodecUtils by lazy { VideoCodecUtils() }
