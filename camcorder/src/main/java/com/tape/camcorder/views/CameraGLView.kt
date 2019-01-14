@@ -99,7 +99,7 @@ class CameraGLView @JvmOverloads constructor(context: Context, attrs: AttributeS
         if (hasSurface) {
             if (cameraHandler == null) {
                 Log.v(TAG, "surface already exist")
-                startPreview(width, height)
+                startPreview()
             }
         }
     }
@@ -151,6 +151,13 @@ class CameraGLView @JvmOverloads constructor(context: Context, attrs: AttributeS
         }
 
         stopPreview(true)
+        startPreview()
+    }
+
+    /**
+     * Starts the preview with a preset video size.
+     */
+    private fun startPreview() {
         startPreview(width, height)
     }
 

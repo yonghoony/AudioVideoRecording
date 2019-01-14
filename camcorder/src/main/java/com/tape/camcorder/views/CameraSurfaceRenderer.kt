@@ -181,8 +181,14 @@ internal class CameraSurfaceRenderer(cameraView: CameraGLView)
             synchronized(this) {
                 if (videoEncoder != null) {
                     // notify to capturing thread that the camera frame is available.
-                    //						videoEncoder.frameAvailableSoon(surfaceTextureMatrix);
-                    videoEncoder!!.frameAvailableSoon(surfaceTextureMatrix, mvpMatrix)
+                    // NOTE:
+                    // Don't pass the mvp matrix which causes the aspect ratio of the output video
+                    // to be distorted by vertical or horizontal stretching.
+                    videoEncoder!!.frameAvailableSoon(surfaceTextureMatrix)
+                    // TODO(yonghoon): Investigate the necessity of mvp matrix for other cases.
+                    //                 At least, it seems unnecessary for video encoding
+                    //                 when the camera view uses the SCALE_CROP_CENTER mode.
+//                    videoEncoder!!.frameAvailableSoon(surfaceTextureMatrix, mvpMatrix)
                 }
             }
         }

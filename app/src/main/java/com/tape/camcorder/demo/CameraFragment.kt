@@ -23,26 +23,25 @@ package com.tape.camcorder.demo
  * All files in the folder are under this Apache License, Version 2.0.
 */
 
-import java.io.IOException
-
 import android.app.Fragment
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-
-import java.io.File
-import android.content.Intent
-import android.net.Uri
-import android.view.MotionEvent
 import com.tape.camcorder.encoder.VideoRecorder
 import com.tape.camcorder.views.CameraGLView
+import kotlinx.android.synthetic.main.fragment_main.switch_camera_button
+import kotlinx.android.synthetic.main.fragment_main.video_size_view
+import java.io.File
+import java.io.IOException
+import kotlinx.android.synthetic.main.fragment_main.camera_view as cameraView
 import kotlinx.android.synthetic.main.fragment_main.record_button as recordButton
 import kotlinx.android.synthetic.main.fragment_main.scalemode_textview as scaleModeTextView
-import kotlinx.android.synthetic.main.fragment_main.camera_view as cameraView
-import kotlinx.android.synthetic.main.fragment_main.switch_camera_button
 
 
 class CameraFragment : Fragment() {
@@ -50,6 +49,9 @@ class CameraFragment : Fragment() {
     companion object {
         private const val TAG = "CameraFragment"
         private const val COLOR_FILTER_RED = -0x10000
+        private const val VIDEO_WIDTH = 414
+        private const val VIDEO_HEIGHT = 736
+        private const val ASPECT_RATIO_FORMAT = "%.2f"
     }
 
     private lateinit var videoRecorder: VideoRecorder
@@ -81,7 +83,7 @@ class CameraFragment : Fragment() {
         cameraView.scaleMode = CameraGLView.SCALE_CROP_CENTER
 
         val display = activity.windowManager.defaultDisplay
-        cameraView.setVideoSize(display.width, display.height)
+        cameraView.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
         scaleModeTextView.setOnClickListener(onClickListener)
         updateScaleModeText()
         recordButton.setOnClickListener(onClickListener)
@@ -89,6 +91,10 @@ class CameraFragment : Fragment() {
             cameraView.toggleCamera()
         }
 
+        val displayAspectRatio = getAspectRatio(display.width, display.height)
+        val videoAspectRatio = getAspectRatio(VIDEO_WIDTH , VIDEO_HEIGHT)
+        video_size_view.text = "Screen(${display.width} X ${display.height}, $displayAspectRatio)" +
+            " - Video($VIDEO_WIDTH X $VIDEO_HEIGHT, $videoAspectRatio)"
         cameraView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 cameraView.focusOnTouch(event.x, event.y)
@@ -97,6 +103,10 @@ class CameraFragment : Fragment() {
         }
 
         videoRecorder = VideoRecorder(cameraView)
+    }
+
+    private fun getAspectRatio(width: Int, height: Int): String {
+        return ASPECT_RATIO_FORMAT.format(width.toFloat() / height.toFloat())
     }
 
     override fun onResume() {
@@ -135,7 +145,7 @@ class CameraFragment : Fragment() {
 
         try {
             recordButton.setColorFilter(COLOR_FILTER_RED)
-            videoRecorder.startRecording(cameraView.measuredWidth, cameraView.measuredHeight)
+            videoRecorder.startRecording(VIDEO_WIDTH, VIDEO_HEIGHT)
         } catch (e: IOException) {
             recordButton.setColorFilter(0)
             Log.e(TAG, "Failed to start recording", e)
