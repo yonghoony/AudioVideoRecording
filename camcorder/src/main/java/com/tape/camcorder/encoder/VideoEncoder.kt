@@ -62,10 +62,10 @@ class VideoEncoder(muxer: MediaMuxerWrapper,
         return result
     }
 
-    fun frameAvailableSoon(tex_matrix: FloatArray, mvp_matrix: FloatArray): Boolean {
+    fun frameAvailableSoon(surfaceTextureMatrix: FloatArray, mvpMatrix: FloatArray): Boolean {
         val result: Boolean = super.frameAvailableSoon()
         if (result)
-            renderHandler!!.draw(tex_matrix, mvp_matrix)
+            renderHandler!!.draw(surfaceTextureMatrix, mvpMatrix)
         return result
     }
 

@@ -75,5 +75,18 @@
         android:textColor="#ffff0000"
         android:background="#66AABBAA"
         />
+    <TextView
+        android:id="@+id/video_size_view"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/scalemode_textview"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="video size"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:textColor="#FF0000FF"
+        android:background="#66AACCFF"
+        />
 
 </RelativeLayout>
